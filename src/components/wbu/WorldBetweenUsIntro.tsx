@@ -293,7 +293,20 @@ export function WorldBetweenUsIntro({ onFinish }: { onFinish: () => void }) {
             <Marker point={p2} label={intro.originTwo.label} align="right" delay={450} />
           </>
         ) : null}
-        {showRoutes ? <Marker point={pd} label={intro.destination.label} align="center" destination delay={900} /> : null}
+        {showRoutes ? (
+          <Marker
+            point={pd}
+            label={
+              Math.abs(intro.destination.lat - intro.originOne.lat) < 0.5 &&
+              Math.abs(intro.destination.lng - intro.originOne.lng) < 0.5
+                ? ""
+                : intro.destination.label
+            }
+            align="center"
+            destination
+            delay={900}
+          />
+        ) : null}
       </div>
 
       {/* Tagline */}
