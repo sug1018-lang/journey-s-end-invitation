@@ -13,9 +13,11 @@ const icons: Record<string, LucideIcon> = {
 };
 
 export function MobileNav() {
-  const items = worldBetweenUsConfig.nav.filter(
-    (item) => worldBetweenUsConfig.sections[item.id as keyof typeof worldBetweenUsConfig.sections] !== false,
-  );
+  const items = worldBetweenUsConfig.nav.filter((item) => {
+    const sections = worldBetweenUsConfig.sections as Record<string, boolean>;
+    return sections[item.id] !== false;
+  });
+
   const [active, setActive] = useState(items[0]?.id ?? "hero");
 
   useEffect(() => {
