@@ -215,7 +215,7 @@ export function WorldBetweenUsIntro({ onFinish }: { onFinish: () => void }) {
 
       {/* Globe */}
       <div
-        className="absolute left-1/2 top-1/2 aspect-square w-[min(82vw,30rem)] -translate-x-1/2 -translate-y-1/2"
+        className="absolute left-1/2 top-1/2 aspect-square w-[min(82vw,30rem)]"
         style={{
           transform: `translate3d(-50%, -50%, 0) scale(${zooming ? 1 + Math.min(view.zoom, 30) * 0.09 : 1})`,
           opacity: state === "idle" ? 0 : transitioning ? 0.25 : 1,

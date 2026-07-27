@@ -18,9 +18,10 @@ function remaining(target: number) {
 
 export function Countdown() {
   const target = new Date(couple.dateISO).getTime();
-  const [time, setTime] = useState(() => remaining(target));
+  const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
+    setTime(remaining(target));
     const timer = window.setInterval(() => setTime(remaining(target)), 1000);
     return () => window.clearInterval(timer);
   }, [target]);
