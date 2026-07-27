@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
+import { EditableText } from "./EditableText";
 
 export function Reveal({
   children,
@@ -24,7 +25,7 @@ export function Reveal({
           observer.disconnect();
         }
       },
-      { threshold: 0.15, rootMargin: "0px 0px -8% 0px" },
+      { threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
     );
     observer.observe(node);
     return () => observer.disconnect();
@@ -46,42 +47,31 @@ export function SectionHeading({
   title,
   subtitle,
   titleId,
-  overlineId,
-  subtitleId,
 }: {
   overline?: string;
   title: string;
   subtitle?: string;
   titleId: string;
-  overlineId?: string;
-  subtitleId?: string;
 }) {
   return (
     <Reveal className="text-center">
-      {overline ? (
-        <EditableHeadingText id={overlineId ?? `${titleId}-overline`} value={overline} className="overline" />
-      ) : null}
-      <EditableHeadingText
+      {overline ? <EditableText id={`${titleId}-overline`} value={overline} className="overline" /> : null}
+      <EditableText
         id={titleId}
         value={title}
         as="h2"
-        className="mt-3 font-display text-[clamp(2rem,8vw,3rem)] font-light leading-[1.1] text-ivory"
+        className="mt-3 block font-display text-[clamp(2rem,8vw,3rem)] font-light leading-[1.1] text-ivory"
       />
       <div className="mx-auto mt-5 h-px w-24 bg-[linear-gradient(90deg,transparent,var(--champagne),transparent)]" />
       {subtitle ? (
-        <EditableHeadingText
-          id={subtitleId ?? `${titleId}-subtitle`}
+        <EditableText
+          id={`${titleId}-subtitle`}
           value={subtitle}
           as="p"
+          multiline
           className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-cloud/70"
         />
       ) : null}
     </Reveal>
   );
-}
-
-import { EditableText } from "./EditableText";
-
-function EditableHeadingText(props: React.ComponentProps<typeof EditableText>) {
-  return <EditableText {...props} />;
 }
