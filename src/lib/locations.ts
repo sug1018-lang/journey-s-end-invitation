@@ -111,9 +111,10 @@ export function mapsSearchUrl(location?: LocationData | null) {
 
 export function directionsUrl(location?: LocationData | null) {
   if (!location) return "";
-  const query = hasCoordinates(location)
-    ? `${location.latitude},${location.longitude}`
-    : [location.venueName, fullAddress(location) || location.label].filter(Boolean).join(" ");
+  const place: LocationData = location;
+  const query = hasCoordinates(place)
+    ? `${place.latitude},${place.longitude}`
+    : [place.venueName, fullAddress(place) || place.label].filter(Boolean).join(" ");
   if (!query.trim().length) return "";
   return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(query)}`;
 }
