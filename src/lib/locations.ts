@@ -75,7 +75,7 @@ export function fullAddress(location?: LocationData | null) {
 }
 
 /** A location is usable by the globe when it has real coordinates. */
-export function hasCoordinates(location?: LocationData | null): location is LocationData {
+export function hasCoordinates(location?: LocationData | null): boolean {
   return Boolean(
     location &&
       isValidLatitude(location.latitude) &&
@@ -111,10 +111,9 @@ export function mapsSearchUrl(location?: LocationData | null) {
 
 export function directionsUrl(location?: LocationData | null) {
   if (!location) return "";
-  const place: LocationData = location;
-  const query = hasCoordinates(place)
-    ? `${place.latitude},${place.longitude}`
-    : [place.venueName, fullAddress(place) || place.label].filter(Boolean).join(" ");
+  const query = hasCoordinates(location)
+    ? `${location.latitude},${location.longitude}`
+    : [location.venueName, fullAddress(location) || location.label].filter(Boolean).join(" ");
   if (!query.trim().length) return "";
   return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(query)}`;
 }
