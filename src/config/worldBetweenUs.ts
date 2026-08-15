@@ -11,11 +11,9 @@ import gallery03 from "@/assets/world-between-us/gallery-03.jpg";
 import gallery04 from "@/assets/world-between-us/gallery-04.jpg";
 import earthTexture from "@/assets/world-between-us/earth-texture.jpg";
 
-export type GeoPoint = {
-  label: string;
-  lat: number;
-  lng: number;
-};
+import type { LocationData, LocationMap } from "@/lib/locations";
+
+export type GeoPoint = { label: string; lat: number; lng: number };
 
 export type SectionKey =
   | "hero"
@@ -23,17 +21,168 @@ export type SectionKey =
   | "countdown"
   | "journey"
   | "schedule"
-  | "venue"
+  | "places"
   | "accommodation"
   | "gallery"
   | "rsvp"
   | "faq"
   | "finalMessage";
 
+export type JourneyItem = {
+  id: string;
+  title: string;
+  date: string;
+  /** Reference to a location — never a duplicated address. */
+  locationId?: string;
+  /** Optional free text used when no location is linked. */
+  place?: string;
+  image: string;
+  text: string;
+  showMapLink?: boolean;
+};
+
+export type ScheduleItem = {
+  id: string;
+  time: string;
+  title: string;
+  description: string;
+  icon: string;
+  locationId?: string;
+  dressCode?: string;
+  note?: string;
+  transport?: string;
+  parking?: string;
+  /** Ask guests about this event in the RSVP form. */
+  rsvp?: boolean;
+};
+
 /**
  * Single source of truth for the "The World Between Us" template.
- * Every text, image, date and coordinate used by the invitation lives here.
+ * Every place lives once in `locations`; sections reference it by id.
  */
+const locations: LocationMap = {
+  "origin-one": {
+    id: "origin-one",
+    label: "Lausanne, Switzerland",
+    city: "Lausanne",
+    country: "Switzerland",
+    countryCode: "CH",
+    latitude: 46.5197,
+    longitude: 6.6323,
+    enabled: true,
+  },
+  "origin-two": {
+    id: "origin-two",
+    label: "Jaffna, Sri Lanka",
+    city: "Jaffna",
+    country: "Sri Lanka",
+    countryCode: "LK",
+    latitude: 9.6615,
+    longitude: 80.0255,
+    enabled: true,
+  },
+  "first-meeting": {
+    id: "first-meeting",
+    label: "Rue de Bourg, Lausanne",
+    city: "Lausanne",
+    country: "Switzerland",
+    countryCode: "CH",
+    latitude: 46.5205,
+    longitude: 6.6339,
+    optional: true,
+    enabled: true,
+  },
+  ceremony: {
+    id: "ceremony",
+    label: "Beau-Rivage Palace",
+    venueName: "Beau-Rivage Palace",
+    address: "Place du Port 17-19",
+    postalCode: "1006",
+    city: "Lausanne",
+    country: "Switzerland",
+    countryCode: "CH",
+    latitude: 46.5079,
+    longitude: 6.6288,
+    websiteUrl: "https://www.brp.ch",
+    notes: "La cérémonie a lieu dans les jardins du palace, face au lac.",
+    parking: "Voiturier disponible à l'entrée principale dès 15:00.",
+    transport: "Métro M2 jusqu'à Ouchy, puis 5 minutes à pied.",
+    imageId: "location-ceremony-image",
+    image: venueImage,
+    imageAlt: "Façade du Beau-Rivage Palace à l'heure dorée",
+    enabled: true,
+  },
+  reception: {
+    id: "reception",
+    label: "Salle Sandoz",
+    venueName: "Salle Sandoz — Beau-Rivage Palace",
+    address: "Place du Port 17-19",
+    postalCode: "1006",
+    city: "Lausanne",
+    country: "Switzerland",
+    countryCode: "CH",
+    latitude: 46.5077,
+    longitude: 6.629,
+    notes: "Dîner assis puis soirée dansante jusqu'au bout de la nuit.",
+    imageId: "location-reception-image",
+    image: finalImage,
+    imageAlt: "Table de mariage dressée au crépuscule",
+    optional: true,
+    enabled: true,
+  },
+  "hotel-main": {
+    id: "hotel-main",
+    label: "Hôtel Angleterre & Résidence",
+    venueName: "Hôtel Angleterre & Résidence",
+    address: "Place du Port 11",
+    postalCode: "1006",
+    city: "Lausanne",
+    country: "Switzerland",
+    countryCode: "CH",
+    latitude: 46.5073,
+    longitude: 6.6262,
+    notes: "Tarif préférentiel sous la mention « Emma & Lucas ».",
+    imageId: "location-hotel-image",
+    image: story03,
+    imageAlt: "Hôtel élégant au bord du lac",
+    optional: true,
+    enabled: true,
+  },
+  "origin-story-one": {
+    id: "origin-story-one",
+    label: "Jaffna, Sri Lanka",
+    city: "Jaffna",
+    country: "Sri Lanka",
+    countryCode: "LK",
+    latitude: 9.6615,
+    longitude: 80.0255,
+    optional: true,
+    enabled: true,
+  },
+  proposal: {
+    id: "proposal",
+    label: "Rochers-de-Naye",
+    city: "Montreux",
+    country: "Switzerland",
+    countryCode: "CH",
+    latitude: 46.4319,
+    longitude: 6.9781,
+    optional: true,
+    enabled: true,
+  },
+  "first-trip": {
+    id: "first-trip",
+    label: "Northern Province, Sri Lanka",
+    city: "Jaffna",
+    country: "Sri Lanka",
+    countryCode: "LK",
+    latitude: 9.7,
+    longitude: 80.05,
+    optional: true,
+    enabled: true,
+  },
+};
+
 export const worldBetweenUsConfig = {
   meta: {
     templateName: "The World Between Us",
@@ -41,23 +190,30 @@ export const worldBetweenUsConfig = {
   },
 
   couple: {
-    partnerOne: "Emma",
-    partnerTwo: "Lucas",
+    partnerOne: { name: "Emma", originLocationId: "origin-one" },
+    partnerTwo: { name: "Lucas", originLocationId: "origin-two" },
     date: "21 September 2027",
     /** ISO date used by the countdown — the only place the target date is defined. */
     dateISO: "2027-09-21T16:00:00+02:00",
-    location: "Lausanne, Switzerland",
+    /** Displayed location = the ceremony location, never a duplicated string. */
+    locationId: "ceremony",
     tagline: "No matter the distance, every road led us here.",
   },
+
+  locations,
 
   intro: {
     earthTexture,
     tagline: "Two worlds. One story.",
+    sameOriginTagline: "Two paths began in the same place.",
     skipLabel: "Passer l'introduction",
     replayLabel: "Revoir l'introduction",
-    originOne: { label: "Lausanne, Switzerland", lat: 46.5197, lng: 6.6323 } as GeoPoint,
-    originTwo: { label: "Jaffna, Sri Lanka", lat: 9.6615, lng: 80.0255 } as GeoPoint,
-    destination: { label: "Lausanne, Switzerland", lat: 46.5197, lng: 6.6323 } as GeoPoint,
+    originOneLocationId: "origin-one",
+    originTwoLocationId: "origin-two",
+    destinationLocationId: "ceremony",
+    showLabels: true,
+    showRoutes: true,
+    enableDestinationZoom: true,
   },
 
   hero: {
@@ -86,59 +242,98 @@ export const worldBetweenUsConfig = {
     items: [
       {
         id: "journey-birthplace",
-        title: "Where It Began",
+        title: "Where Our Stories Began",
         date: "1994 — 1996",
-        place: "Jaffna, Sri Lanka · Lausanne, Switzerland",
+        locationId: "origin-story-one",
         image: story02,
+        showMapLink: false,
         text: "Two children, two coastlines, two languages. Neither of them knew the other existed, and yet both were already walking in the same direction.",
       },
       {
         id: "journey-meeting",
         title: "First Meeting",
         date: "April 2022",
-        place: "Rue de Bourg, Lausanne",
+        locationId: "first-meeting",
         image: story01,
+        showMapLink: true,
         text: "A cancelled train, a crowded café, one free chair. Three hours later the coffee was cold and neither of them had noticed.",
       },
       {
         id: "journey-trip",
         title: "Our First Trip",
         date: "December 2023",
-        place: "Northern Province, Sri Lanka",
+        locationId: "first-trip",
         image: story04,
+        showMapLink: false,
         text: "Emma met the ocean Lucas grew up with. That week, the distance between the two worlds became a shared address.",
       },
       {
         id: "journey-proposal",
         title: "The Proposal",
         date: "August 2026",
-        place: "Rochers-de-Naye, Switzerland",
+        locationId: "proposal",
         image: story03,
+        showMapLink: true,
         text: "Above the clouds, before sunrise, with the lake still asleep below. One question, one word, and every road finally pointed to the same place.",
       },
-    ],
+    ] as JourneyItem[],
   },
 
   schedule: {
     title: "The Itinerary",
     subtitle: "Le programme du jour",
     items: [
-      { time: "15:30", title: "Guest Arrival", description: "Welcome drinks on the lake terrace.", icon: "arrival" },
-      { time: "16:00", title: "Wedding Ceremony", description: "In the palace gardens, facing the water.", icon: "ceremony" },
-      { time: "17:30", title: "Cocktail", description: "Champagne, canapés and golden hour by Lake Geneva.", icon: "cocktail" },
-      { time: "19:30", title: "Dinner", description: "A seated dinner in the Salle Sandoz.", icon: "dinner" },
-      { time: "22:00", title: "Celebration", description: "Dancing until the last light on the lake.", icon: "party" },
-    ],
+      {
+        id: "event-arrival",
+        time: "15:30",
+        title: "Guest Arrival",
+        description: "Welcome drinks on the lake terrace.",
+        icon: "arrival",
+        locationId: "ceremony",
+      },
+      {
+        id: "event-ceremony",
+        time: "16:00",
+        title: "Wedding Ceremony",
+        description: "In the palace gardens, facing the water.",
+        icon: "ceremony",
+        locationId: "ceremony",
+        dressCode: "Tenue formelle — évitez les talons fins (cérémonie sur l'herbe).",
+        rsvp: true,
+      },
+      {
+        id: "event-cocktail",
+        time: "17:30",
+        title: "Cocktail",
+        description: "Champagne, canapés and golden hour by Lake Geneva.",
+        icon: "cocktail",
+        locationId: "ceremony",
+      },
+      {
+        id: "event-dinner",
+        time: "19:30",
+        title: "Dinner",
+        description: "A seated dinner in the Salle Sandoz.",
+        icon: "dinner",
+        locationId: "reception",
+        rsvp: true,
+      },
+      {
+        id: "event-party",
+        time: "22:00",
+        title: "Celebration",
+        description: "Dancing until the last light on the lake.",
+        icon: "party",
+        locationId: "reception",
+        rsvp: true,
+      },
+    ] as ScheduleItem[],
   },
 
-  venue: {
-    title: "The Place We Chose",
-    name: "Beau-Rivage Palace",
-    address: "Place du Port 17-19, 1006 Lausanne, Switzerland",
-    note: "Valet parking is available at the main entrance from 15:00.",
-    image: venueImage,
-    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Beau-Rivage+Palace+Lausanne",
-    mapsLabel: "Open in Google Maps",
+  places: {
+    title: "The Places We Chose",
+    subtitle: "Les lieux du mariage",
+    locationIds: ["ceremony", "reception", "hotel-main"],
   },
 
   accommodation: {
@@ -176,6 +371,9 @@ export const worldBetweenUsConfig = {
     successTitle: "Your seat is reserved",
     successBody: "Thank you — we have received your answer. We cannot wait to share this day with you.",
     mealOptions: ["Menu classique", "Menu végétarien", "Menu sans gluten", "Menu enfant"],
+    askTransport: true,
+    askAccommodation: true,
+    askDepartureCity: true,
   },
 
   faq: {
@@ -209,7 +407,7 @@ export const worldBetweenUsConfig = {
     countdown: true,
     journey: true,
     schedule: true,
-    venue: true,
+    places: true,
     accommodation: true,
     gallery: true,
     rsvp: true,
@@ -219,3 +417,10 @@ export const worldBetweenUsConfig = {
 };
 
 export type WorldBetweenUsConfig = typeof worldBetweenUsConfig;
+
+/** Default location list, cloned so runtime overrides never mutate the config. */
+export function defaultLocations(): LocationMap {
+  return Object.fromEntries(
+    Object.entries(locations).map(([key, value]) => [key, { ...value } as LocationData]),
+  );
+}
