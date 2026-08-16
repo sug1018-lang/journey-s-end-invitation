@@ -4,27 +4,53 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
+
+import { defaultLocations, worldBetweenUsConfig } from "@/config/worldBetweenUs";
+import type { LocationData, LocationMap } from "@/lib/locations";
 
 export type ImageOverride = {
   src?: string;
   focalPoint?: string;
   zoom?: number;
   brightness?: number;
+  alt?: string;
+};
+
+export type IntroSettings = {
+  originOneLocationId: string;
+  originTwoLocationId: string;
+  destinationLocationId: string;
+  showLabels: boolean;
+  showRoutes: boolean;
+  enableDestinationZoom: boolean;
 };
 
 type Overrides = {
   images: Record<string, ImageOverride>;
   texts: Record<string, string>;
   gallery?: { id: string; src: string; alt: string }[];
+  locations?: LocationMap;
+  intro?: Partial<IntroSettings>;
 };
 
 const STORAGE_KEY = "world-between-us-overrides";
+const BACKUP_KEY = "world-between-us-overrides-backup";
 const ADMIN_KEY = "world-between-us-admin";
 
 const emptyOverrides: Overrides = { images: {}, texts: {} };
+
+const defaultIntroSettings: IntroSettings = {
+  originOneLocationId: worldBetweenUsConfig.intro.originOneLocationId,
+  originTwoLocationId: worldBetweenUsConfig.intro.originTwoLocationId,
+  destinationLocationId: worldBetweenUsConfig.intro.destinationLocationId,
+  showLabels: worldBetweenUsConfig.intro.showLabels,
+  showRoutes: worldBetweenUsConfig.intro.showRoutes,
+  enableDestinationZoom: worldBetweenUsConfig.intro.enableDestinationZoom,
+};
 
 type EditModeContextValue = {
   isAdmin: boolean;
@@ -36,15 +62,34 @@ type EditModeContextValue = {
   getText: (id: string, fallback: string) => string;
   setText: (id: string, value: string | null) => void;
   setGallery: (items: { id: string; src: string; alt: string }[] | null) => void;
+  /** Every place of the invitation, merged defaults + saved edits. */
+  locations: LocationMap;
+  getLocation: (id?: string) => LocationData | undefined;
+  introSettings: IntroSettings;
+  /** Persist a whole set of places + intro settings (used by the Places editor). */
+  applyLocations: (locations: LocationMap, intro: IntroSettings) => void;
+  /** Restores the state captured before the last save. */
+  restorePreviousLocations: () => boolean;
   resetAll: () => void;
 };
 
 const EditModeContext = createContext<EditModeContextValue | null>(null);
 
+function mergeLocations(saved?: LocationMap): LocationMap {
+  const base = defaultLocations();
+  if (!saved) return base;
+  const merged: LocationMap = { ...base };
+  for (const [id, value] of Object.entries(saved)) {
+    merged[id] = { ...(base[id] ?? {}), ...value, id };
+  }
+  return merged;
+}
+
 export function EditModeProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [overrides, setOverrides] = useState<Overrides>(emptyOverrides);
+  const backupRef = useRef<Overrides | null>(null);
 
   useEffect(() => {
     try {
@@ -61,8 +106,12 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
           images: parsed.images ?? {},
           texts: parsed.texts ?? {},
           gallery: parsed.gallery,
+          locations: parsed.locations,
+          intro: parsed.intro,
         });
       }
+      const backup = window.localStorage.getItem(BACKUP_KEY);
+      if (backup) backupRef.current = JSON.parse(backup) as Overrides;
     } catch {
       /* storage unavailable — stay on defaults */
     }
@@ -76,6 +125,12 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
       /* quota or private mode — keep in memory */
     }
   }, []);
+
+  const locations = useMemo(() => mergeLocations(overrides.locations), [overrides.locations]);
+  const introSettings = useMemo<IntroSettings>(
+    () => ({ ...defaultIntroSettings, ...(overrides.intro ?? {}) }),
+    [overrides.intro],
+  );
 
   const value = useMemo<EditModeContextValue>(
     () => ({
@@ -98,9 +153,27 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
         persist({ ...overrides, texts });
       },
       setGallery: (items) => persist({ ...overrides, gallery: items ?? undefined }),
+      locations,
+      getLocation: (id) => (id ? locations[id] : undefined),
+      introSettings,
+      applyLocations: (nextLocations, nextIntro) => {
+        backupRef.current = overrides;
+        try {
+          window.localStorage.setItem(BACKUP_KEY, JSON.stringify(overrides));
+        } catch {
+          /* ignore */
+        }
+        persist({ ...overrides, locations: nextLocations, intro: nextIntro });
+      },
+      restorePreviousLocations: () => {
+        const backup = backupRef.current;
+        if (!backup) return false;
+        persist(backup);
+        return true;
+      },
       resetAll: () => persist(emptyOverrides),
     }),
-    [isAdmin, editMode, overrides, persist],
+    [isAdmin, editMode, overrides, persist, locations, introSettings],
   );
 
   return <EditModeContext.Provider value={value}>{children}</EditModeContext.Provider>;
