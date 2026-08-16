@@ -3,26 +3,27 @@ import { useEffect, useState } from "react";
 import { Globe2 } from "lucide-react";
 
 import { worldBetweenUsConfig } from "@/config/worldBetweenUs";
+import { placeLine } from "@/lib/locations";
 import { AdminBar } from "@/components/wbu/AdminBar";
 import { MobileNav } from "@/components/wbu/MobileNav";
-import { EditModeProvider } from "@/components/wbu/edit-mode";
+import { EditModeProvider, useEditMode } from "@/components/wbu/edit-mode";
 import { INTRO_SEEN_KEY, WorldBetweenUsIntro } from "@/components/wbu/WorldBetweenUsIntro";
 import { Hero } from "@/components/wbu/sections/Hero";
 import { Welcome } from "@/components/wbu/sections/Welcome";
 import { Countdown } from "@/components/wbu/sections/Countdown";
 import { Journey } from "@/components/wbu/sections/Journey";
 import { Schedule } from "@/components/wbu/sections/Schedule";
-import { Venue } from "@/components/wbu/sections/Venue";
+import { Places } from "@/components/wbu/sections/Places";
 import { Accommodation } from "@/components/wbu/sections/Accommodation";
 import { Gallery } from "@/components/wbu/sections/Gallery";
 import { Rsvp } from "@/components/wbu/sections/Rsvp";
 import { Faq } from "@/components/wbu/sections/Faq";
 import { FinalMessage } from "@/components/wbu/sections/FinalMessage";
 
-const { couple, sections, intro } = worldBetweenUsConfig;
+const { couple, sections, intro, locations: defaultLocationMap, hero } = worldBetweenUsConfig;
 
-const title = `${couple.partnerOne} & ${couple.partnerTwo} — The World Between Us`;
-const description = `${couple.date} · ${couple.location}. ${couple.tagline}`;
+const title = `${couple.partnerOne.name} & ${couple.partnerTwo.name} — The World Between Us`;
+const description = `${couple.date} · ${placeLine(defaultLocationMap[couple.locationId])}. ${couple.tagline}`;
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -35,10 +36,19 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: WorldBetweenUsPage,
+  component: WorldBetweenUsRoute,
 });
 
+function WorldBetweenUsRoute() {
+  return (
+    <EditModeProvider>
+      <WorldBetweenUsPage />
+    </EditModeProvider>
+  );
+}
+
 function WorldBetweenUsPage() {
+  const { getLocation, introSettings } = useEditMode();
   const [introDone, setIntroDone] = useState(true);
   const [replayKey, setReplayKey] = useState(0);
 
@@ -71,9 +81,23 @@ function WorldBetweenUsPage() {
   };
 
   return (
-    <EditModeProvider>
+    <>
       {!introDone ? (
-        <WorldBetweenUsIntro key={replayKey} onFinish={() => setIntroDone(true)} />
+        <WorldBetweenUsIntro
+          key={replayKey}
+          onFinish={() => setIntroDone(true)}
+          places={{
+            originOne: getLocation(introSettings.originOneLocationId),
+            originTwo: getLocation(introSettings.originTwoLocationId),
+            destination: getLocation(introSettings.destinationLocationId),
+            tagline: intro.tagline,
+            sameOriginTagline: intro.sameOriginTagline,
+            showLabels: introSettings.showLabels,
+            showRoutes: introSettings.showRoutes,
+            enableDestinationZoom: introSettings.enableDestinationZoom,
+            destinationImage: hero.backgroundImage,
+          }}
+        />
       ) : null}
 
       <main className="relative pb-24">
@@ -82,7 +106,7 @@ function WorldBetweenUsPage() {
         {sections.countdown ? <Countdown /> : null}
         {sections.journey ? <Journey /> : null}
         {sections.schedule ? <Schedule /> : null}
-        {sections.venue ? <Venue /> : null}
+        {sections.places ? <Places /> : null}
         {sections.accommodation ? <Accommodation /> : null}
         {sections.gallery ? <Gallery /> : null}
         {sections.rsvp ? <Rsvp /> : null}
@@ -103,6 +127,6 @@ function WorldBetweenUsPage() {
 
       <AdminBar />
       <MobileNav />
-    </EditModeProvider>
+    </>
   );
 }
