@@ -1,12 +1,18 @@
 import { ChevronDown } from "lucide-react";
 
 import { worldBetweenUsConfig } from "@/config/worldBetweenUs";
+import { placeLine } from "@/lib/locations";
 import { EditableImage } from "../EditableImage";
 import { EditableText } from "../EditableText";
+import { useEditMode } from "../edit-mode";
 
 const { couple, hero } = worldBetweenUsConfig;
 
 export function Hero() {
+  const { getLocation } = useEditMode();
+  const place = getLocation(couple.locationId);
+  const locationLine = placeLine(place);
+
   return (
     <section id="hero" className="relative min-h-[100svh] w-full overflow-hidden">
       {hero.backgroundVideo ? (
@@ -23,7 +29,7 @@ export function Hero() {
         <EditableImage
           id="hero-background"
           src={hero.backgroundImage}
-          alt={`${couple.partnerOne} & ${couple.partnerTwo} — ${couple.location}`}
+          alt={`${couple.partnerOne.name} & ${couple.partnerTwo.name} — ${locationLine}`}
           className="absolute inset-0 h-full w-full"
           priority
         />
@@ -37,7 +43,7 @@ export function Hero() {
         <h1 className="mt-8 flex flex-col items-center gap-1 font-display text-ivory">
           <EditableText
             id="couple-partner-one"
-            value={couple.partnerOne}
+            value={couple.partnerOne.name}
             className="wbu-reveal text-[clamp(3rem,17vw,5.5rem)] font-light leading-[0.95] tracking-[0.02em]"
           />
           <EditableText
@@ -47,7 +53,7 @@ export function Hero() {
           />
           <EditableText
             id="couple-partner-two"
-            value={couple.partnerTwo}
+            value={couple.partnerTwo.name}
             className="wbu-reveal text-[clamp(3rem,17vw,5.5rem)] font-light leading-[0.95] tracking-[0.02em]"
           />
         </h1>
@@ -56,7 +62,7 @@ export function Hero() {
 
         <div className="mt-6 space-y-2 text-[0.78rem] uppercase tracking-[0.3em] text-cloud/85">
           <EditableText id="couple-date" value={couple.date} as="p" />
-          <EditableText id="couple-location" value={couple.location} as="p" />
+          {locationLine ? <p>{locationLine}</p> : null}
         </div>
 
         <EditableText
