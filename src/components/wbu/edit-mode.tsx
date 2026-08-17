@@ -29,12 +29,20 @@ export type IntroSettings = {
   enableDestinationZoom: boolean;
 };
 
+export type ContactSettings = {
+  enabled: boolean;
+  phone: string;
+  label: string;
+  message: string;
+};
+
 type Overrides = {
   images: Record<string, ImageOverride>;
   texts: Record<string, string>;
   gallery?: { id: string; src: string; alt: string }[];
   locations?: LocationMap;
   intro?: Partial<IntroSettings>;
+  contact?: Partial<ContactSettings>;
 };
 
 const STORAGE_KEY = "world-between-us-overrides";
