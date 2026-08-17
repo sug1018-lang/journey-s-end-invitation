@@ -14,7 +14,10 @@ export function AdminBar() {
     <>
       <div
         className="fixed right-3 z-[90] flex flex-col gap-2"
-        style={{ top: "max(0.75rem, env(safe-area-inset-top))" }}
+        style={{
+          top: "max(0.75rem, env(safe-area-inset-top))",
+          display: placesOpen ? "none" : undefined,
+        }}
       >
         <button
           type="button"
