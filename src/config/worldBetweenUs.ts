@@ -392,6 +392,15 @@ export const worldBetweenUsConfig = {
     signature: "Emma & Lucas — 21.09.2027",
   },
 
+  /** Contact / WhatsApp — always visible to guests when enabled. */
+  contact: {
+    enabled: true,
+    phone: "",
+    label: "WhatsApp",
+    /** Pre-filled message guests will send. */
+    message: "Hello Emma & Lucas, I have a question about your wedding.",
+  },
+
   nav: [
     { id: "hero", label: "Accueil", icon: "home" },
     { id: "journey", label: "Voyage", icon: "route" },
