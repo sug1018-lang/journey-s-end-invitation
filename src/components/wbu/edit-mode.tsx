@@ -60,6 +60,13 @@ const defaultIntroSettings: IntroSettings = {
   enableDestinationZoom: worldBetweenUsConfig.intro.enableDestinationZoom,
 };
 
+const defaultContactSettings: ContactSettings = {
+  enabled: worldBetweenUsConfig.contact.enabled,
+  phone: worldBetweenUsConfig.contact.phone,
+  label: worldBetweenUsConfig.contact.label,
+  message: worldBetweenUsConfig.contact.message,
+};
+
 type EditModeContextValue = {
   isAdmin: boolean;
   editMode: boolean;
@@ -79,6 +86,10 @@ type EditModeContextValue = {
   /** Restores the state captured before the last save. */
   restorePreviousLocations: () => boolean;
   resetAll: () => void;
+  /** Contact settings merged with defaults. */
+  contactSettings: ContactSettings;
+  /** Persist contact settings (used by the Contact editor). */
+  applyContact: (settings: ContactSettings) => void;
 };
 
 const EditModeContext = createContext<EditModeContextValue | null>(null);
