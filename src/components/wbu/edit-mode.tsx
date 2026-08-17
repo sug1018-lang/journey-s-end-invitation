@@ -127,6 +127,7 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
           gallery: parsed.gallery,
           locations: parsed.locations,
           intro: parsed.intro,
+          contact: parsed.contact,
         });
       }
       const backup = window.localStorage.getItem(BACKUP_KEY);
@@ -149,6 +150,10 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
   const introSettings = useMemo<IntroSettings>(
     () => ({ ...defaultIntroSettings, ...(overrides.intro ?? {}) }),
     [overrides.intro],
+  );
+  const contactSettings = useMemo<ContactSettings>(
+    () => ({ ...defaultContactSettings, ...(overrides.contact ?? {}) }),
+    [overrides.contact],
   );
 
   const value = useMemo<EditModeContextValue>(
@@ -191,8 +196,10 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
         return true;
       },
       resetAll: () => persist(emptyOverrides),
+      contactSettings,
+      applyContact: (settings) => persist({ ...overrides, contact: settings }),
     }),
-    [isAdmin, editMode, overrides, persist, locations, introSettings],
+    [isAdmin, editMode, overrides, persist, locations, introSettings, contactSettings],
   );
 
   return <EditModeContext.Provider value={value}>{children}</EditModeContext.Provider>;
