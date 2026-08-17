@@ -29,12 +29,20 @@ export type IntroSettings = {
   enableDestinationZoom: boolean;
 };
 
+export type ContactSettings = {
+  enabled: boolean;
+  phone: string;
+  label: string;
+  message: string;
+};
+
 type Overrides = {
   images: Record<string, ImageOverride>;
   texts: Record<string, string>;
   gallery?: { id: string; src: string; alt: string }[];
   locations?: LocationMap;
   intro?: Partial<IntroSettings>;
+  contact?: Partial<ContactSettings>;
 };
 
 const STORAGE_KEY = "world-between-us-overrides";
@@ -50,6 +58,13 @@ const defaultIntroSettings: IntroSettings = {
   showLabels: worldBetweenUsConfig.intro.showLabels,
   showRoutes: worldBetweenUsConfig.intro.showRoutes,
   enableDestinationZoom: worldBetweenUsConfig.intro.enableDestinationZoom,
+};
+
+const defaultContactSettings: ContactSettings = {
+  enabled: worldBetweenUsConfig.contact.enabled,
+  phone: worldBetweenUsConfig.contact.phone,
+  label: worldBetweenUsConfig.contact.label,
+  message: worldBetweenUsConfig.contact.message,
 };
 
 type EditModeContextValue = {
@@ -71,6 +86,10 @@ type EditModeContextValue = {
   /** Restores the state captured before the last save. */
   restorePreviousLocations: () => boolean;
   resetAll: () => void;
+  /** Contact settings merged with defaults. */
+  contactSettings: ContactSettings;
+  /** Persist contact settings (used by the Contact editor). */
+  applyContact: (settings: ContactSettings) => void;
 };
 
 const EditModeContext = createContext<EditModeContextValue | null>(null);
@@ -108,6 +127,7 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
           gallery: parsed.gallery,
           locations: parsed.locations,
           intro: parsed.intro,
+          contact: parsed.contact,
         });
       }
       const backup = window.localStorage.getItem(BACKUP_KEY);
@@ -130,6 +150,10 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
   const introSettings = useMemo<IntroSettings>(
     () => ({ ...defaultIntroSettings, ...(overrides.intro ?? {}) }),
     [overrides.intro],
+  );
+  const contactSettings = useMemo<ContactSettings>(
+    () => ({ ...defaultContactSettings, ...(overrides.contact ?? {}) }),
+    [overrides.contact],
   );
 
   const value = useMemo<EditModeContextValue>(
@@ -172,8 +196,10 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
         return true;
       },
       resetAll: () => persist(emptyOverrides),
+      contactSettings,
+      applyContact: (settings) => persist({ ...overrides, contact: settings }),
     }),
-    [isAdmin, editMode, overrides, persist, locations, introSettings],
+    [isAdmin, editMode, overrides, persist, locations, introSettings, contactSettings],
   );
 
   return <EditModeContext.Provider value={value}>{children}</EditModeContext.Provider>;
