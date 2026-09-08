@@ -31,9 +31,16 @@ export type IntroSettings = {
 
 export type ContactSettings = {
   enabled: boolean;
-  phone: string;
+  /** International number, any formatting; empty hides the button. */
+  whatsappNumber: string;
+  whatsappMessage: string;
   label: string;
-  message: string;
+};
+
+/** ISO alpha-2 codes for the two origins. Empty string = not set. */
+export type CountrySettings = {
+  partner1Country: string;
+  partner2Country: string;
 };
 
 type Overrides = {
@@ -43,6 +50,7 @@ type Overrides = {
   locations?: LocationMap;
   intro?: Partial<IntroSettings>;
   contact?: Partial<ContactSettings>;
+  countries?: Partial<CountrySettings>;
 };
 
 const STORAGE_KEY = "world-between-us-overrides";

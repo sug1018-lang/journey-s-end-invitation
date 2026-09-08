@@ -190,8 +190,9 @@ export const worldBetweenUsConfig = {
   },
 
   couple: {
-    partnerOne: { name: "Emma", originLocationId: "origin-one" },
-    partnerTwo: { name: "Lucas", originLocationId: "origin-two" },
+    /** `countryCode` = ISO 3166-1 alpha-2 (see src/lib/countries.ts). Empty = generic intro. */
+    partnerOne: { name: "Emma", originLocationId: "origin-one", countryCode: "CH" },
+    partnerTwo: { name: "Lucas", originLocationId: "origin-two", countryCode: "LK" },
     date: "21 September 2027",
     /** ISO date used by the countdown — the only place the target date is defined. */
     dateISO: "2027-09-21T16:00:00+02:00",
@@ -392,13 +393,16 @@ export const worldBetweenUsConfig = {
     signature: "Emma & Lucas — 21.09.2027",
   },
 
-  /** Contact / WhatsApp — always visible to guests when enabled. */
+  /**
+   * Contact / WhatsApp. Leave `whatsappNumber` empty and the button never renders.
+   * These four values (plus the two country codes above) are the fields a future
+   * Speedinvite dashboard can push into the template without code changes.
+   */
   contact: {
     enabled: true,
-    phone: "",
+    whatsappNumber: "",
+    whatsappMessage: "Hello Emma & Lucas, I have a question about your wedding.",
     label: "WhatsApp",
-    /** Pre-filled message guests will send. */
-    message: "Hello Emma & Lucas, I have a question about your wedding.",
   },
 
   nav: [
