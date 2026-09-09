@@ -97,6 +97,9 @@ export type IntroPlaces = {
   enableDestinationZoom?: boolean;
   /** Image used for the final hand-off (falls back to the hero background). */
   destinationImage?: string;
+  /** Origin countries of the couple — optional, the intro stays generic without them. */
+  countryOne?: Country;
+  countryTwo?: Country;
 };
 
 export function WorldBetweenUsIntro({
