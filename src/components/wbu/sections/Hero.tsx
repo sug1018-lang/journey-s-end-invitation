@@ -2,6 +2,7 @@ import { ChevronDown } from "lucide-react";
 
 import { worldBetweenUsConfig } from "@/config/worldBetweenUs";
 import { placeLine } from "@/lib/locations";
+import { countryName, flagEmoji } from "@/lib/countries";
 import { EditableImage } from "../EditableImage";
 import { EditableText } from "../EditableText";
 import { useEditMode } from "../edit-mode";
@@ -9,9 +10,11 @@ import { useEditMode } from "../edit-mode";
 const { couple, hero } = worldBetweenUsConfig;
 
 export function Hero() {
-  const { getLocation } = useEditMode();
+  const { getLocation, countrySettings } = useEditMode();
   const place = getLocation(couple.locationId);
   const locationLine = placeLine(place);
+  const flagOne = flagEmoji(countrySettings.partner1Country);
+  const flagTwo = flagEmoji(countrySettings.partner2Country);
 
   return (
     <section id="hero" className="relative min-h-[100svh] w-full overflow-hidden">
