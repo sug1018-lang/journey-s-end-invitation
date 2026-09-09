@@ -61,6 +61,28 @@ export function Hero() {
           />
         </h1>
 
+        {flagOne || flagTwo ? (
+          <p className="mt-4 flex items-center justify-center gap-3 text-[0.7rem] uppercase tracking-[0.28em] text-cloud/75">
+            {flagOne ? (
+              <span title={countryName(countrySettings.partner1Country)}>
+                <span aria-hidden="true" className="text-base">
+                  {flagOne}
+                </span>
+                <span className="sr-only">{countryName(countrySettings.partner1Country)}</span>
+              </span>
+            ) : null}
+            {flagOne && flagTwo ? <span className="text-champagne/70">&amp;</span> : null}
+            {flagTwo ? (
+              <span title={countryName(countrySettings.partner2Country)}>
+                <span aria-hidden="true" className="text-base">
+                  {flagTwo}
+                </span>
+                <span className="sr-only">{countryName(countrySettings.partner2Country)}</span>
+              </span>
+            ) : null}
+          </p>
+        ) : null}
+
         <div className="mx-auto mt-8 h-px w-28 bg-[linear-gradient(90deg,transparent,var(--champagne),transparent)]" />
 
         <div className="mt-6 space-y-2 text-[0.78rem] uppercase tracking-[0.3em] text-cloud/85">
