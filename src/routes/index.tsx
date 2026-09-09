@@ -4,7 +4,9 @@ import { Globe2 } from "lucide-react";
 
 import { worldBetweenUsConfig } from "@/config/worldBetweenUs";
 import { placeLine } from "@/lib/locations";
+import { findCountry } from "@/lib/countries";
 import { AdminBar } from "@/components/wbu/AdminBar";
+import { WhatsAppButton } from "@/components/wbu/WhatsAppButton";
 import { MobileNav } from "@/components/wbu/MobileNav";
 import { EditModeProvider, useEditMode } from "@/components/wbu/edit-mode";
 import { INTRO_SEEN_KEY, WorldBetweenUsIntro } from "@/components/wbu/WorldBetweenUsIntro";
@@ -48,7 +50,7 @@ function WorldBetweenUsRoute() {
 }
 
 function WorldBetweenUsPage() {
-  const { getLocation, introSettings } = useEditMode();
+  const { getLocation, introSettings, countrySettings } = useEditMode();
   const [introDone, setIntroDone] = useState(true);
   const [replayKey, setReplayKey] = useState(0);
 
@@ -96,6 +98,8 @@ function WorldBetweenUsPage() {
             showRoutes: introSettings.showRoutes,
             enableDestinationZoom: introSettings.enableDestinationZoom,
             destinationImage: hero.backgroundImage,
+            countryOne: findCountry(countrySettings.partner1Country),
+            countryTwo: findCountry(countrySettings.partner2Country),
           }}
         />
       ) : null}
@@ -125,6 +129,7 @@ function WorldBetweenUsPage() {
         </div>
       </main>
 
+      <WhatsAppButton />
       <AdminBar />
       <MobileNav />
     </>
