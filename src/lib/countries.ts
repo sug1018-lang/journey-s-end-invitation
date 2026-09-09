@@ -154,3 +154,22 @@ export function findCountry(code?: string): Country | undefined {
 export function countryName(code?: string): string {
   return findCountry(code)?.name ?? "";
 }
+
+/**
+ * Some desktop systems (notably Windows) render flag emoji as two letter boxes.
+ * Measuring the glyph tells us whether to show the flag or fall back to the code.
+ */
+export function flagEmojiSupported(): boolean {
+  if (typeof document === "undefined") return true;
+  try {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return true;
+    ctx.font = "24px sans-serif";
+    const flag = ctx.measureText("\u{1F1E8}\u{1F1ED}").width;
+    const single = ctx.measureText("\u{1F1E8}").width;
+    return flag < single * 1.9;
+  } catch {
+    return true;
+  }
+}
