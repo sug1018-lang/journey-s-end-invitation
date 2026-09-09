@@ -30,8 +30,7 @@ export function WhatsAppButton() {
       style={{ bottom: "calc(env(safe-area-inset-bottom) + 4.75rem)" }}
     >
       <WhatsAppGlyph className="size-[18px] shrink-0 text-[#25D366]" />
-      <span className="hidden xs:inline">{contactSettings.label || "WhatsApp"}</span>
-      <span className="xs:hidden sr-only">{contactSettings.label || "WhatsApp"}</span>
+      <span>{contactSettings.label || "WhatsApp"}</span>
     </a>
   );
 }

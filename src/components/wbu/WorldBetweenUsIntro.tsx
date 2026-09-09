@@ -9,6 +9,8 @@ import {
   type LocationData,
 } from "@/lib/locations";
 import { cn } from "@/lib/utils";
+import type { Country } from "@/lib/countries";
+import { IntroCountries } from "./IntroCountries";
 
 export type WorldIntroState =
   | "idle"
