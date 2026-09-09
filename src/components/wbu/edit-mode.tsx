@@ -70,9 +70,14 @@ const defaultIntroSettings: IntroSettings = {
 
 const defaultContactSettings: ContactSettings = {
   enabled: worldBetweenUsConfig.contact.enabled,
-  phone: worldBetweenUsConfig.contact.phone,
+  whatsappNumber: worldBetweenUsConfig.contact.whatsappNumber,
+  whatsappMessage: worldBetweenUsConfig.contact.whatsappMessage,
   label: worldBetweenUsConfig.contact.label,
-  message: worldBetweenUsConfig.contact.message,
+};
+
+const defaultCountrySettings: CountrySettings = {
+  partner1Country: worldBetweenUsConfig.couple.partnerOne.countryCode ?? "",
+  partner2Country: worldBetweenUsConfig.couple.partnerTwo.countryCode ?? "",
 };
 
 type EditModeContextValue = {
@@ -98,6 +103,9 @@ type EditModeContextValue = {
   contactSettings: ContactSettings;
   /** Persist contact settings (used by the Contact editor). */
   applyContact: (settings: ContactSettings) => void;
+  /** The two origin countries (ISO codes), merged with defaults. */
+  countrySettings: CountrySettings;
+  applyCountries: (settings: CountrySettings) => void;
 };
 
 const EditModeContext = createContext<EditModeContextValue | null>(null);
