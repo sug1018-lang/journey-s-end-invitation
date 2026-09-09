@@ -70,9 +70,14 @@ const defaultIntroSettings: IntroSettings = {
 
 const defaultContactSettings: ContactSettings = {
   enabled: worldBetweenUsConfig.contact.enabled,
-  phone: worldBetweenUsConfig.contact.phone,
+  whatsappNumber: worldBetweenUsConfig.contact.whatsappNumber,
+  whatsappMessage: worldBetweenUsConfig.contact.whatsappMessage,
   label: worldBetweenUsConfig.contact.label,
-  message: worldBetweenUsConfig.contact.message,
+};
+
+const defaultCountrySettings: CountrySettings = {
+  partner1Country: worldBetweenUsConfig.couple.partnerOne.countryCode ?? "",
+  partner2Country: worldBetweenUsConfig.couple.partnerTwo.countryCode ?? "",
 };
 
 type EditModeContextValue = {
@@ -98,6 +103,9 @@ type EditModeContextValue = {
   contactSettings: ContactSettings;
   /** Persist contact settings (used by the Contact editor). */
   applyContact: (settings: ContactSettings) => void;
+  /** The two origin countries (ISO codes), merged with defaults. */
+  countrySettings: CountrySettings;
+  applyCountries: (settings: CountrySettings) => void;
 };
 
 const EditModeContext = createContext<EditModeContextValue | null>(null);
@@ -136,6 +144,7 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
           locations: parsed.locations,
           intro: parsed.intro,
           contact: parsed.contact,
+          countries: parsed.countries,
         });
       }
       const backup = window.localStorage.getItem(BACKUP_KEY);
@@ -162,6 +171,10 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
   const contactSettings = useMemo<ContactSettings>(
     () => ({ ...defaultContactSettings, ...(overrides.contact ?? {}) }),
     [overrides.contact],
+  );
+  const countrySettings = useMemo<CountrySettings>(
+    () => ({ ...defaultCountrySettings, ...(overrides.countries ?? {}) }),
+    [overrides.countries],
   );
 
   const value = useMemo<EditModeContextValue>(
@@ -206,8 +219,19 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
       resetAll: () => persist(emptyOverrides),
       contactSettings,
       applyContact: (settings) => persist({ ...overrides, contact: settings }),
+      countrySettings,
+      applyCountries: (settings) => persist({ ...overrides, countries: settings }),
     }),
-    [isAdmin, editMode, overrides, persist, locations, introSettings, contactSettings],
+    [
+      isAdmin,
+      editMode,
+      overrides,
+      persist,
+      locations,
+      introSettings,
+      contactSettings,
+      countrySettings,
+    ],
   );
 
   return <EditModeContext.Provider value={value}>{children}</EditModeContext.Provider>;

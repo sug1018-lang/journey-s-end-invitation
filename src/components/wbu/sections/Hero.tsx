@@ -2,6 +2,7 @@ import { ChevronDown } from "lucide-react";
 
 import { worldBetweenUsConfig } from "@/config/worldBetweenUs";
 import { placeLine } from "@/lib/locations";
+import { countryName, flagEmoji } from "@/lib/countries";
 import { EditableImage } from "../EditableImage";
 import { EditableText } from "../EditableText";
 import { useEditMode } from "../edit-mode";
@@ -9,9 +10,11 @@ import { useEditMode } from "../edit-mode";
 const { couple, hero } = worldBetweenUsConfig;
 
 export function Hero() {
-  const { getLocation } = useEditMode();
+  const { getLocation, countrySettings } = useEditMode();
   const place = getLocation(couple.locationId);
   const locationLine = placeLine(place);
+  const flagOne = flagEmoji(countrySettings.partner1Country);
+  const flagTwo = flagEmoji(countrySettings.partner2Country);
 
   return (
     <section id="hero" className="relative min-h-[100svh] w-full overflow-hidden">
@@ -57,6 +60,28 @@ export function Hero() {
             className="wbu-reveal text-[clamp(3rem,17vw,5.5rem)] font-light leading-[0.95] tracking-[0.02em]"
           />
         </h1>
+
+        {flagOne || flagTwo ? (
+          <p className="mt-4 flex items-center justify-center gap-3 text-[0.7rem] uppercase tracking-[0.28em] text-cloud/75">
+            {flagOne ? (
+              <span title={countryName(countrySettings.partner1Country)}>
+                <span aria-hidden="true" className="text-base">
+                  {flagOne}
+                </span>
+                <span className="sr-only">{countryName(countrySettings.partner1Country)}</span>
+              </span>
+            ) : null}
+            {flagOne && flagTwo ? <span className="text-champagne/70">&amp;</span> : null}
+            {flagTwo ? (
+              <span title={countryName(countrySettings.partner2Country)}>
+                <span aria-hidden="true" className="text-base">
+                  {flagTwo}
+                </span>
+                <span className="sr-only">{countryName(countrySettings.partner2Country)}</span>
+              </span>
+            ) : null}
+          </p>
+        ) : null}
 
         <div className="mx-auto mt-8 h-px w-28 bg-[linear-gradient(90deg,transparent,var(--champagne),transparent)]" />
 

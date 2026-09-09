@@ -9,6 +9,8 @@ import {
   type LocationData,
 } from "@/lib/locations";
 import { cn } from "@/lib/utils";
+import type { Country } from "@/lib/countries";
+import { IntroCountries } from "./IntroCountries";
 
 export type WorldIntroState =
   | "idle"
@@ -95,6 +97,9 @@ export type IntroPlaces = {
   enableDestinationZoom?: boolean;
   /** Image used for the final hand-off (falls back to the hero background). */
   destinationImage?: string;
+  /** Origin countries of the couple — optional, the intro stays generic without them. */
+  countryOne?: Country;
+  countryTwo?: Country;
 };
 
 export function WorldBetweenUsIntro({
@@ -382,6 +387,21 @@ export function WorldBetweenUsIntro({
           />
         ) : null}
       </div>
+
+      {/* Origin countries — same visual weight for both */}
+      <IntroCountries
+        one={places.countryOne}
+        two={places.countryTwo}
+        phase={
+          transitioning
+            ? "hidden"
+            : state === "showingTagline" || state === "zoomingToDestination"
+              ? "union"
+              : showOrigins
+                ? "origins"
+                : "hidden"
+        }
+      />
 
       {/* Tagline */}
       <p
