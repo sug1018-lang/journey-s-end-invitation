@@ -388,6 +388,21 @@ export function WorldBetweenUsIntro({
         ) : null}
       </div>
 
+      {/* Origin countries — same visual weight for both */}
+      <IntroCountries
+        one={places.countryOne}
+        two={places.countryTwo}
+        phase={
+          transitioning
+            ? "hidden"
+            : state === "showingTagline" || state === "zoomingToDestination"
+              ? "union"
+              : showOrigins
+                ? "origins"
+                : "hidden"
+        }
+      />
+
       {/* Tagline */}
       <p
         className="absolute inset-x-0 bottom-[22%] px-8 text-center font-display text-[clamp(1.6rem,7vw,2.6rem)] font-light tracking-[0.16em] text-ivory"
