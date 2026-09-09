@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { MapPin, PencilLine, RotateCcw, Eye } from "lucide-react";
+import { Globe, MapPin, PencilLine, RotateCcw, Eye } from "lucide-react";
 
 import { LocationsPanel } from "./LocationsPanel";
+import { CouplePanel } from "./CouplePanel";
 import { useEditMode } from "./edit-mode";
 
 /** Discreet bar shown only to the couple / admins (?edit=1). Guests never see it. */
 export function AdminBar() {
   const { isAdmin, editMode, setEditMode, resetAll } = useEditMode();
   const [placesOpen, setPlacesOpen] = useState(false);
+  const [coupleOpen, setCoupleOpen] = useState(false);
   if (!isAdmin) return null;
 
   return (
