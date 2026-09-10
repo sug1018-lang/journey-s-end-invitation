@@ -76,10 +76,15 @@ function CountryCard({
       }}
     >
       <span
-        className="text-[clamp(1.7rem,8vw,2.6rem)] leading-none"
+        className={cn(
+          "leading-none",
+          flagsOk
+            ? "text-[clamp(1.7rem,8vw,2.6rem)]"
+            : "font-display text-[clamp(1.3rem,6vw,1.9rem)] tracking-[0.18em] text-champagne",
+        )}
         style={{ filter: "drop-shadow(0 6px 18px rgba(9,20,38,.85))" }}
       >
-        {flagEmoji(country.code)}
+        {flagsOk ? flagEmoji(country.code) : country.code}
       </span>
       <span
         className="max-w-[9.5rem] truncate text-[10px] uppercase tracking-[0.28em] text-ivory/85"
