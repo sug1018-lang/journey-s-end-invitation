@@ -1,5 +1,6 @@
 import { flagEmoji, type Country } from "@/lib/countries";
 import { cn } from "@/lib/utils";
+import { useFlagSupport } from "./use-flag-support";
 
 export type IntroCountriesProps = {
   one?: Country;
@@ -64,6 +65,7 @@ function CountryCard({
   visible: boolean;
   delay?: number;
 }) {
+  const flagsOk = useFlagSupport();
   if (!country) return null;
   const offset = side === "left" ? -18 : 18;
   return (
