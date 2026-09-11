@@ -183,6 +183,15 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
   const value = useMemo<EditModeContextValue>(
     () => ({
       isAdmin,
+      exitAdmin: () => {
+        try {
+          window.localStorage.removeItem(ADMIN_KEY);
+        } catch {
+          /* ignore */
+        }
+        setIsAdmin(false);
+        setEditMode(false);
+      },
       editMode: isAdmin && editMode,
       setEditMode,
       overrides,
