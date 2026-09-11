@@ -10,6 +10,7 @@ import { WhatsAppButton } from "@/components/wbu/WhatsAppButton";
 import { MobileNav } from "@/components/wbu/MobileNav";
 import { EditModeProvider, useEditMode } from "@/components/wbu/edit-mode";
 import { INTRO_SEEN_KEY, WorldBetweenUsIntro } from "@/components/wbu/WorldBetweenUsIntro";
+import { REPLAY_INTRO_EVENT } from "@/components/wbu/intro-events";
 import { Hero } from "@/components/wbu/sections/Hero";
 import { Welcome } from "@/components/wbu/sections/Welcome";
 import { Countdown } from "@/components/wbu/sections/Countdown";
@@ -70,6 +71,12 @@ function WorldBetweenUsPage() {
       document.body.style.overflow = "";
     };
   }, [introDone]);
+
+  useEffect(() => {
+    const handler = () => replay();
+    window.addEventListener(REPLAY_INTRO_EVENT, handler);
+    return () => window.removeEventListener(REPLAY_INTRO_EVENT, handler);
+  }, []);
 
   const replay = () => {
     try {
