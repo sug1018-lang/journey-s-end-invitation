@@ -82,6 +82,8 @@ const defaultCountrySettings: CountrySettings = {
 
 type EditModeContextValue = {
   isAdmin: boolean;
+  /** Leaves the couple mode on this device (guest view). */
+  exitAdmin: () => void;
   editMode: boolean;
   setEditMode: (value: boolean) => void;
   overrides: Overrides;
@@ -130,8 +132,9 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
     try {
       const params = new URLSearchParams(window.location.search);
       const paramValue = params.get("edit");
-      if (paramValue === "1") window.localStorage.setItem(ADMIN_KEY, "true");
-      if (paramValue === "0") window.localStorage.removeItem(ADMIN_KEY);
+      const hasAdminParam = params.has("admin") && params.get("admin") !== "0";
+      if (paramValue === "1" || hasAdminParam) window.localStorage.setItem(ADMIN_KEY, "true");
+      if (paramValue === "0" || params.get("admin") === "0") window.localStorage.removeItem(ADMIN_KEY);
       setIsAdmin(window.localStorage.getItem(ADMIN_KEY) === "true");
 
       const raw = window.localStorage.getItem(STORAGE_KEY);
