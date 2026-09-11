@@ -71,6 +71,12 @@ function WorldBetweenUsPage() {
     };
   }, [introDone]);
 
+  useEffect(() => {
+    const handler = () => replay();
+    window.addEventListener(REPLAY_INTRO_EVENT, handler);
+    return () => window.removeEventListener(REPLAY_INTRO_EVENT, handler);
+  }, []);
+
   const replay = () => {
     try {
       window.sessionStorage.removeItem(INTRO_SEEN_KEY);
